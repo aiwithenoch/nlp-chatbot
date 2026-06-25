@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How an NLP-Powered Chatbot Understands You — Youth in AI Series</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="A 10-minute self-guided interactive lesson explaining how traditional NLP chatbots understand and process human text. Built for the Youth in AI series.">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top App Header -->
+    <header>
+      <div class="logo-area">
+        <span class="badge">Youth in AI Workshop</span>
+        <span class="badge" style="background: var(--secondary-blue); border-color: rgba(11, 61, 46, 0.15); color: var(--primary-cyan);">Traditional NLP</span>
+        <button class="badge" id="btn-sound-toggle" onclick="toggleSound()" style="cursor: pointer; background: var(--bg-dark); border-color: var(--primary-cyan); color: var(--primary-cyan); font-weight: 700; font-family: var(--font-display);">🔊 Sound On</button>
+      </div>
+      <h1 class="main-title">How an NLP-Powered Chatbot Understands You</h1>
+    </header>
+
+    <!-- Progress Tracker Bar -->
+    <div class="progress-container">
+      <div class="progress-header">
+        <span id="progress-percent">0% Complete</span>
+        <span class="time-indicator" id="time-left">About 10 min left</span>
+      </div>
+      <div class="progress-steps-bar">
+        <div class="progress-steps-line"></div>
+        <div id="progress-bar-fill" class="progress-steps-line-fill"></div>
+        
+        <!-- Step 1: Raw Message -->
+        <div class="step-node" id="step-node-1" onclick="appState.currentStep = 1; renderApp();">
+          <div class="step-bullet">1</div>
+          <div class="step-label">Message</div>
+        </div>
+        
+        <!-- Step 2: Tokenization -->
+        <div class="step-node" id="step-node-2" onclick="appState.currentStep = 2; renderApp();">
+          <div class="step-bullet">2</div>
+          <div class="step-label">Split Words</div>
+        </div>
+        
+        <!-- Step 3: Text Cleaning -->
+        <div class="step-node" id="step-node-3" onclick="appState.currentStep = 3; renderApp();">
+          <div class="step-bullet">3</div>
+          <div class="step-label">Clean Text</div>
+        </div>
+        
+        <!-- Step 4: Words to Numbers -->
+        <div class="step-node" id="step-node-4" onclick="appState.currentStep = 4; renderApp();">
+          <div class="step-bullet">4</div>
+          <div class="step-label">Numbers</div>
+        </div>
+        
+        <!-- Step 5: Intent Detection -->
+        <div class="step-node" id="step-node-5" onclick="appState.currentStep = 5; renderApp();">
+          <div class="step-bullet">5</div>
+          <div class="step-label">Intent</div>
+        </div>
+        
+        <!-- Step 6: Entity Extraction -->
+        <div class="step-node" id="step-node-6" onclick="appState.currentStep = 6; renderApp();">
+          <div class="step-bullet">6</div>
+          <div class="step-label">Details</div>
+        </div>
+        
+        <!-- Step 7: Workflow Routing -->
+        <div class="step-node" id="step-node-7" onclick="appState.currentStep = 7; renderApp();">
+          <div class="step-bullet">7</div>
+          <div class="step-label">Workflow</div>
+        </div>
+        
+        <!-- Step 8: Reply -->
+        <div class="step-node" id="step-node-8" onclick="appState.currentStep = 8; renderApp();">
+          <div class="step-bullet">8</div>
+          <div class="step-label">Reply</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dynamic Workspace -->
+    <main class="main-workspace">
+      
+      <!-- Visual Animation / Interactive Left Panel -->
+      <section class="visual-panel" id="visual-panel-id">
+        
+        <!-- Stage 0: Intro Input Screen -->
+        <div class="animation-stage" id="stage-0">
+          <div class="intro-layout">
+            <div class="intro-icon">🤖</div>
+            <div class="input-card">
+              <span class="input-label">Click below to use the default workshop message</span>
+              <div class="preset-message">"Hi, I want to join the event tomorrow."</div>
+              <button class="btn btn-primary" onclick="selectPresetMessage()" style="width: 100%; justify-content: center; margin-bottom: 1rem;">
+                Use Default Message
+              </button>
+              
+              <div class="input-separator">Or Type Your Own Message</div>
+              
+              <div class="custom-input-group">
+                <input type="text" id="custom-input-field" class="custom-input" placeholder="e.g., How much does the class cost?">
+                <button class="btn-use-custom" onclick="setCustomMessage()">Go</button>
+              </div>
+            </div>
+            <p class="intro-small-note">This simulation shows how a traditional NLP chatbot works without an LLM.</p>
+          </div>
+        </div>
+
+        <!-- Stage 1: Raw Message Receiving -->
+        <div class="animation-stage hidden-stage" id="stage-1">
+          <div class="chat-container">
+            <span style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; align-self: flex-start;">User Message Influx</span>
+            <div class="chat-bubble user-bubble" id="incoming-msg-bubble"></div>
+          </div>
+        </div>
+
+        <!-- Stage 2: Tokenization splits -->
+        <div class="animation-stage hidden-stage" id="stage-2">
+          <div class="token-grid" id="tokens-anim-grid"></div>
+          <div class="token-analogy-box">
+            <span style="font-size: 1.25rem;">🧱</span>
+            <span>Analogy: Breaking a sentence into Lego blocks before building with them.</span>
+          </div>
+        </div>
+
+        <!-- Stage 3: Text Cleaning differences -->
+        <div class="animation-stage hidden-stage" id="stage-3">
+          <div class="clean-container" id="cleaning-flow-box"></div>
+        </div>
+
+        <!-- Stage 4: Words to Numbers (Vector matrix) -->
+        <div class="animation-stage hidden-stage" id="stage-4">
+          <div class="vector-layout">
+            <div class="vector-cards-container" id="vector-cards-box"></div>
+            <div class="vector-table-container">
+              <table class="vector-table">
+                <thead>
+                  <tr>
+                    <th>Target Keyword</th>
+                    <th>In User Sentence?</th>
+                  </tr>
+                </thead>
+                <tbody id="vector-table-body"></tbody>
+              </table>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">Simplified illustration — not real model values.</p>
+          </div>
+        </div>
+
+        <!-- Stage 5: Intent Detection scores -->
+        <div class="animation-stage hidden-stage" id="stage-5">
+          <div class="intent-container">
+            <div class="intent-headline">Classifier Intent Comparison</div>
+            <div id="intent-charts-box"></div>
+            <div class="intent-badge-result" id="intent-winner-badge"></div>
+          </div>
+        </div>
+
+        <!-- Stage 6: Entity Extraction highlights -->
+        <div class="animation-stage hidden-stage" id="stage-6">
+          <div class="entity-container">
+            <div class="entity-bubble" id="entity-highlight-sentence"></div>
+            <div class="entity-legend-grid" id="entities-cards-grid"></div>
+          </div>
+        </div>
+
+        <!-- Stage 7: Workflow Roadmap -->
+        <div class="animation-stage hidden-stage" id="stage-7">
+          <div class="workflow-map" id="workflow-nodes-map"></div>
+        </div>
+
+        <!-- Stage 8: Reply screen bubble -->
+        <div class="animation-stage hidden-stage" id="stage-8">
+          <div class="chat-container" id="reply-chat-bubbles"></div>
+        </div>
+
+        <!-- Stage 9: Traditional vs LLM Comparison -->
+        <div class="animation-stage hidden-stage" id="stage-9">
+          <div class="compare-container">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Traditional NLP Chatbot</th>
+                  <th>LLM-Powered Chatbot</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Learns predefined intents</td>
+                  <td>Understands flexible wording out-of-the-box</td>
+                </tr>
+                <tr>
+                  <td>Follows fixed workflows</td>
+                  <td>Can handle broader, multi-turn conversations</td>
+                </tr>
+                <tr>
+                  <td>Good for expected questions</td>
+                  <td>Better with unexpected questions</td>
+                </tr>
+                <tr>
+                  <td>More controlled and safe</td>
+                  <td>More flexible but can make mistakes (hallucinate)</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="final-agent-callout">
+              <div class="final-agent-title">From Chatbot to AI Agent</div>
+              <div class="final-agent-text">The chatbot you just saw is NLP-powered. Add a Large Language Model (LLM), conversation memory, documents, and tools — and it evolves into an autonomous AI Agent.</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Explanation & Educational Content Right Panel -->
+      <section class="explanation-panel" id="explanation-scroll-container">
+        <div>
+          <div class="step-title-area">
+            <div class="step-num" id="step-num-label">Lesson Start</div>
+            <h2 class="step-heading" id="step-title">Welcome to Chatbot Academy</h2>
+          </div>
+          
+          <div class="explanation-content" id="explanation-content-area">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Controls -->
+    <nav class="control-bar">
+      <button class="btn btn-secondary" id="btn-restart" onclick="restartLesson()">
+        <span>🔄</span> Restart
+      </button>
+      
+      <div class="nav-buttons-group">
+        <button class="btn btn-secondary" id="btn-back" onclick="goBack()" disabled>
+          <span>&larr;</span> Back
+        </button>
+        <button class="btn btn-secondary" id="btn-replay" onclick="replayAnimation()">
+          <span>🔁</span> Replay Animation
+        </button>
+        <button class="btn btn-primary" id="btn-next" onclick="goNext()">
+          Find Out <span class="arrow">&rarr;</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Footer -->
+    <footer>
+      Youth in AI Series: Practical AI Skills for Social Impact.
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
